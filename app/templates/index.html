@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- 新規スレッド作成ボタン -->
+<div class="section-box" style="text-align: center;">
+    <a href="/threads/new" class="button">新規スレッド作成</a>
+</div>
+
+<!-- スレッド一覧（タイトルのみ） -->
+<div class="section-box">
+    <h3>スレッド一覧</h3>
+
+    <ul class="thread-list">
+        {% for thread in threads %}
+            <li>
+                <a href="/threads/{{ thread.id }}/view">{{ thread.title }}</a><br>
+                <small>作成日時：{{ thread.created_at }}</small>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+
+<!-- 最新投稿（スレッドの先頭10件） -->
+<div class="section-box">
+    <h3>最新投稿（先頭10件）</h3>
+
+    {% for post in latest_posts %}
+        <div>
+        {%if post.thread_title %}
+            {{post.post_number}}:<strong>{{ post.thread_title }} - {{post.author}}</strong><br>
+        {% else %}
+            {{post.post_number}}:<strong>{{post.author}}</strong><br>
+        {% endif%}
+
+            {{ post.content }}<br>
+            <small>日時：{{ post.created_at }}</small>
+            {% if post.attachment %}
+            <div class="attachment">
+                <img src="/static/uploads/{{ post.attachment }}"
+                        style="max-width: 300px; border: 1px solid #ccc;">
+            </div>
+            {% endif %}
+            <hr>
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
