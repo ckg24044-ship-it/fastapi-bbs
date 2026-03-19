@@ -11,3 +11,5 @@ class Post(Base):
     parent_post_id = Column(Integer, ForeignKey("posts.id"), nullable=True)
     content = Column(String, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
+    author = Column(String, nullable=False, server_default="名無しさん")
+    attachment = Column(String, nullable=True) 
