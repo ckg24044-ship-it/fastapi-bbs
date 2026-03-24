@@ -12,30 +12,30 @@
 
 </script>
 <div class="section-box">
-    {% for post in latest_posts %}
-        <div>
-        {%if post.thread_title %}
-            {{post.post_number}}:<strong>{{ post.thread_title }} - {{post.author}}</strong><br>
-        {% else %}
-            {{post.post_number}}:<strong>{{post.author}}</strong><br>
-        {% endif%}
+    {% for post in posts %}
+    <div>
+
+        {{ post.post_number }}:
+        <strong>{{ post.author }}</strong><br>
+
         {% if post.parent_post_number %}
             >>{{ post.parent_post_number }}
         {% endif %}
-            {{ post.content }}<br>
-            <small>日時：{{ post.created_at }}</small>
-            {% if post.attachment %}
-            <div class="attachment">
-                <img src="/static/uploads/{{ post.attachment }}"
-                        style="max-width: 300px; border: 1px solid #ccc;">
-            </div>
-            {% endif %}
-            <a onclick="repost_no({{post.post_number}},{{post.id}})"">返信</a>
-            <hr>
+
+        {{ post.content }}<br>
+        <small>日時：{{ post.created_at }}</small>
+
+        {% if post.attachment %}
+        <div class="attachment">
+            <img src="/static/uploads/{{ post.attachment }}"
+                 style="max-width: 300px; border: 1px solid #ccc;">
         </div>
-        {%if post.thread_title %}
-        <h3>投稿一覧</h3>
         {% endif %}
+
+        <a onclick="repost_no({{ post.post_number }}, {{ post.id }})">返信</a>
+
+        <hr>
+    </div>
     {% endfor %}
 </div>
 <h2>投稿フォーム</h2>

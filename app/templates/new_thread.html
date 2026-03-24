@@ -1,33 +1,108 @@
 {% extends "base.html" %}
+
 {% block content %}
 
-<h2>新規スレッド作成</h2>
+<script>
+function repost_no(num, hidden_num){
+    const elm = document.getElementById("parent_post_id");
+    elm.value = num;
+    document.getElementById("parent_post_id_hidden").value = hidden_num;
+    window.scrollTo({top: elm.offsetTop, behavior:'smooth'});
+}
+</script>
 
-<form action="/threads/create" method="post" enctype="multipart/form-data" class="standard-form">
+<h2>スレッド詳細</h2>
 
-    <!-- スレッドタイトル -->
-    <label for="title">スレッドタイトル（必須）</label>
-    <input type="text" id="title" name="title" required>
+<!-- 先頭投稿 -->
+{% if first_post %}
+<div>
+    {{ first_post["post_number"] }}:
+    <strong>{{ first_post["author"] }}</strong><br>
 
-    <!-- 名前（任意） -->
-    <label for="author">名前（任意）</label>
-    <input type="text" id="author" name="author" placeholder="未入力なら『名無しさん』扱い">
+    {{ first_post["content"] }}<br>
+    <small>日時：{{ first_post["created_at"] }}</small>
 
-    <!-- 本文（必須） -->
-    <label for="content">本文（必須）</label>
-    <textarea id="content" name="content" rows="8" required></textarea>
-
-    <!-- 画像添付（後で実装） -->
-    <label for="image">画像添付（任意）</label>
-    <div class="image-box">
-        <input type="file" id="image" name="image" accept=".jpg,.png,.gif">
-        <span class="file-info">※jpg / png / gif 2MBまで（後で決める必要あり）</span>
+    {% if first_post["attachment"] %}
+    <div>
+        <img src="/static/uploads/{{ first_post['attachment'] }}" style="max-width:300px;">
     </div>
+    {% endif %}
+</div>
+<hr>
+{% endif %}
 
-    <div class="buttons">
-        <button type="submit" class="btn-create">作成する</button>
-        <button type="reset" class="btn-reset">リセット</button>
+<!-- 投稿一覧 -->
+{% for post in posts %}
+<div>
+
+    {{ post["post_number"] }}:
+    <strong>{{ post["author"] }}</strong><br>
+
+    {% if post["parent_post_number"] %}
+        >>{{ post["parent_post_number"] }}
+    {% endif %}
+
+    {{ post["content"] }}<br>
+    <small>日時：{{ post["created_at"] }}</small>
+
+    {% if post["attachment"] %}
+    <div>
+        <img src="/static/uploads/{{ post['attachment'] }}" style="max-width:300px;">
     </div>
+    {% endif %}
+
+    <a onclick="repost_no({{ post['post_number'] }}, {{ post['id'] }})">返信</a>
+
+</div>
+<hr>
+{% endfor %}
+
+<!-- ページネーション -->
+{% if total_pages > 1 %}
+<div>
+
+    {% if page > 1 %}
+        <a href="/threads/{{ thread_id }}/view?page=1">«</a>
+        <a href="/threads/{{ thread_id }}/view?page={{ page - 1 }}">‹</a>
+    {% endif %}
+
+    {% for p in range(1, total_pages + 1) %}
+        {% if p == page %}
+            <strong>{{ p }}</strong>
+        {% else %}
+            <a href="/threads/{{ thread_id }}/view?page={{ p }}">{{ p }}</a>
+        {% endif %}
+    {% endfor %}
+
+    {% if page < total_pages %}
+        <a href="/threads/{{ thread_id }}/view?page={{ page + 1 }}">›</a>
+        <a href="/threads/{{ thread_id }}/view?page={{ total_pages }}">»</a>
+    {% endif %}
+
+</div>
+{% endif %}
+
+<hr>
+
+<h2>投稿フォーム</h2>
+
+<form action="/threads/{{thread_id}}/post" method="post" enctype="multipart/form-data">
+
+    <label>返信番号</label>
+    <input type="text" id="parent_post_id" name="parent_post_id">
+    <input type="hidden" id="parent_post_id_hidden" name="parent_post_id_hidden">
+
+    <label>名前</label>
+    <input type="text" name="author">
+
+    <label>本文</label>
+    <textarea name="content" rows="5" required></textarea>
+
+    <label>画像</label>
+    <input type="file" name="image">
+
+    <br><br>
+    <button type="submit">投稿</button>
 
 </form>
 
